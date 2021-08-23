@@ -19,20 +19,10 @@ import {
   dialog,
   globalShortcut,
 } from 'electron';
-import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
 import fs from 'fs';
 import robot from 'robotjs';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
-
-export default class AppUpdater {
-  constructor() {
-    log.transports.file.level = 'info';
-    autoUpdater.logger = log;
-    autoUpdater.checkForUpdatesAndNotify();
-  }
-}
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -130,7 +120,7 @@ const createWindow = async () => {
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   // @TODO: Use 'ready-to-show' event
-  //        https://github.com/electron/electron/blob/main/docs/api/browser-window.md#using-ready-to-show-event
+  // https://github.com/electron/electron/blob/main/docs/api/browser-window.md#using-ready-to-show-event
   mainWindow.webContents.on('did-finish-load', () => {
     if (!mainWindow) {
       throw new Error('"mainWindow" is not defined');
@@ -155,10 +145,6 @@ const createWindow = async () => {
     event.preventDefault();
     shell.openExternal(url);
   });
-
-  // Remove this if your app does not use auto updates
-  // eslint-disable-next-line
-  new AppUpdater();
 
   let isF8Down = false;
   globalShortcut.register('F8', () => {
