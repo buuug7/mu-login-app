@@ -17,7 +17,10 @@ contextBridge.exposeInMainWorld('electron', {
     },
 
     runMu(muFolder, ipAndPort) {
-      const ipAndPortArr = ipAndPort.split(':');
+      let ipAndPortArr = ['120.26.54.40', '44405'];
+      if (ipAndPort) {
+        ipAndPortArr = ipAndPort.split(':');
+      }
       process.chdir(muFolder);
       const executablePath = `${muFolder}\\main.exe`;
       const param = ['connect', `/u${ipAndPortArr[0]}`, `/p${ipAndPortArr[1]}`];

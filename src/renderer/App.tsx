@@ -26,7 +26,9 @@ const Index = () => {
     electron.ipcRenderer.once('GET_USER_DATA', (data: any) => {
       console.log(data);
       setMuFolder(data.muFolder);
-      setIpAndPort(data.ipAndPort);
+      if (data.ipAndPort) {
+        setIpAndPort(data.ipAndPort);
+      }
     });
 
     electron.ipcRenderer.getUserData();
@@ -64,7 +66,12 @@ const Index = () => {
         </Link>
       </div>
 
-      <div className="footer text-muted text-center">一个有脾气的登录器</div>
+      <div className="footer text-muted text-center">
+        <a href="http://mu.yoursoups.com/" target="_blank" rel="noreferrer">
+          土鳖奇迹网站
+        </a>
+        <div>一个有脾气的登录器 v1.1.0</div>
+      </div>
     </div>
   );
 };

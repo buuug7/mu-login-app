@@ -17,7 +17,7 @@
 - `git clone https://github.com/buuug7/mu-login-app.git`
 - `cd mu-login-git`
 - `npm install`
-- dev `npm run start`
-- package with `npm run build`
+- run `npm run start` for develop
+- run `npm run build` to build your release
 
 the build package is under `build/release` folder
