@@ -25,7 +25,9 @@ const Index = () => {
   useEffect(() => {
     electron.ipcRenderer.once('GET_USER_DATA', (data: any) => {
       console.log(data);
-      setMuFolder(data.muFolder);
+      if (data.muFolder) {
+        setMuFolder(data.muFolder);
+      }
       if (data.ipAndPort) {
         setIpAndPort(data.ipAndPort);
       }
@@ -56,6 +58,10 @@ const Index = () => {
           type="button"
           className="btn btn-primary me-1"
           onClick={() => {
+            if (!muFolder) {
+              window.alert('请在设置中选择Mu客户端目录');
+              return;
+            }
             electron.ipcRenderer.runMu(muFolder, ipAndPort);
           }}
         >
@@ -109,8 +115,13 @@ function SettingPage() {
     electron.ipcRenderer.getRegedit();
 
     electron.ipcRenderer.once('GET_USER_DATA', (data: any) => {
-      setMuFolder(data.muFolder);
-      setIpAndPort(data.ipAndPort);
+      if (data.muFolder) {
+        setMuFolder(data.muFolder);
+      }
+
+      if (data.ipAndPort) {
+        setIpAndPort(data.ipAndPort);
+      }
     });
 
     electron.ipcRenderer.getUserData();

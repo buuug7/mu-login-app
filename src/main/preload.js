@@ -25,12 +25,8 @@ contextBridge.exposeInMainWorld('electron', {
       const executablePath = `${muFolder}\\main.exe`;
       const param = ['connect', `/u${ipAndPortArr[0]}`, `/p${ipAndPortArr[1]}`];
       child.execFile(executablePath, param, (err, data) => {
-        const rs = { message: '' };
         if (err) {
           console.error(err);
-          rs.message = err;
-        } else {
-          rs.message = data.toString();
         }
       });
     },
