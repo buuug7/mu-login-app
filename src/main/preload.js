@@ -21,14 +21,21 @@ contextBridge.exposeInMainWorld('electron', {
       if (ipAndPort) {
         ipAndPortArr = ipAndPort.split(':');
       }
-      process.chdir(muFolder);
       const executablePath = `${muFolder}\\main.exe`;
       const param = ['connect', `/u${ipAndPortArr[0]}`, `/p${ipAndPortArr[1]}`];
-      child.execFile(executablePath, param, (err, data) => {
-        if (err) {
-          console.error(err);
+      child.execFile(
+        executablePath,
+        param,
+        {
+          cwd: muFolder,
+        },
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        (err, stdout, stderr) => {
+          if (err) {
+            console.error(err);
+          }
         }
-      });
+      );
     },
 
     /**
