@@ -148,10 +148,6 @@ const createWindow = async () => {
 
   let isF8Down = false;
   globalShortcut.register('F8', () => {
-    console.log('Electron loves global shortcuts!');
-    console.log('Electron loves global shortcuts!');
-    console.log('Electron loves global shortcuts!');
-
     console.log(`isF8Down`, isF8Down);
 
     if (!isF8Down) {
@@ -160,6 +156,24 @@ const createWindow = async () => {
     } else {
       robot.mouseToggle('up', 'right');
       isF8Down = false;
+    }
+  });
+
+  let timerF7: any = null;
+  globalShortcut.register('F7', () => {
+    console.log(`timerF7`, timerF7);
+    // robot.setKeyboardDelay(50);
+
+    if (timerF7) {
+      clearInterval(timerF7);
+      timerF7 = null;
+      robot.mouseToggle('up', 'right');
+    } else {
+      robot.mouseToggle('down', 'right');
+      timerF7 = setInterval(() => {
+        robot.keyTap('1');
+        robot.keyTap('2');
+      }, 30);
     }
   });
 };
@@ -174,6 +188,7 @@ app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
     app.quit();
   }
+  console.log(`window is closed!!!!`);
 });
 
 app.whenReady().then(createWindow).catch(console.log);

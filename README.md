@@ -11,6 +11,7 @@
 - 声音开关
 - 自定义 IP 跟端口号
 - 支持 F8 右键挂机
+- 支持 F7 一键连击
 
 ## how to build from source
 

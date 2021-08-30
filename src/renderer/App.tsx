@@ -42,9 +42,10 @@ const Index = () => {
         <h2 className="text-center">土鳖奇迹登录器</h2>
       </div>
 
-      <p className="text-center text-muted mt-3">
-        使用F8右键挂机(取消再次按F8)
-      </p>
+      <div className="text-center text-muted mt-3 mb-3">
+        <div>F8右键挂机, F7一键连击</div>
+        <div>取消请再次按相同快捷键</div>
+      </div>
 
       <div className="body container">
         <div className="text-center">
