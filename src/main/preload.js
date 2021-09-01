@@ -115,5 +115,9 @@ contextBridge.exposeInMainWorld('electron', {
     getUserData() {
       ipcRenderer.send('GET_USER_DATA');
     },
+
+    downloadFile() {
+      ipcRenderer.send('DOWNLOAD_FILE');
+    },
   },
 });

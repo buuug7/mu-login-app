@@ -94,6 +94,7 @@ function SettingPage() {
   const [muFolder, setMuFolder] = useState('');
   const [ipAndPort, setIpAndPort] = useState('');
   const [Message, setMessage] = useState('');
+  const [isDownloading, setIsDownloading] = useState(false);
 
   const onResolutionChange = (e: any) => {
     setResolution(Number(e.target.value));
@@ -309,12 +310,32 @@ function SettingPage() {
           </button>
           <button
             type="submit"
-            className="btn btn-outline-primary"
+            className="btn btn-outline-primary me-2"
             onClick={() => {
               history.go(-1);
             }}
           >
             返回
+          </button>
+
+          <button
+            type="submit"
+            className="btn btn-outline-primary"
+            disabled={isDownloading}
+            onClick={(e) => {
+              e.preventDefault();
+              setIsDownloading(true);
+              setMessage('');
+              electron.ipcRenderer.once('DOWNLOAD_FILE', (data: any) => {
+                console.log(`data`, data);
+                setMessage(data);
+                setIsDownloading(false);
+              });
+
+              electron.ipcRenderer.downloadFile();
+            }}
+          >
+            {isDownloading ? '下载中...' : '更新客户端'}
           </button>
         </form>
       </div>

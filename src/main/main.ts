@@ -21,8 +21,9 @@ import {
 } from 'electron';
 import fs from 'fs';
 import robot from 'robotjs';
+
 import MenuBuilder from './menu';
-import { resolveHtmlPath } from './util';
+import { resolveHtmlPath, downloadByUrl } from './util';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -51,7 +52,7 @@ ipcMain.on('SAVE_USER_DATA', async (event, data) => {
   event.reply('SAVE_USER_DATA', 'save data');
 });
 
-ipcMain.on('GET_USER_DATA', async (event) => {
+function getUserData() {
   const userDataPath = app.getPath('userData');
   const dataPath = path.join(userDataPath, 'mu-login-app.json');
   let data;
@@ -61,7 +62,37 @@ ipcMain.on('GET_USER_DATA', async (event) => {
     console.log(error);
     data = {};
   }
+  return data;
+}
+
+ipcMain.on('GET_USER_DATA', async (event) => {
+  const data = getUserData();
   event.reply('GET_USER_DATA', data);
+});
+
+ipcMain.on('DOWNLOAD_FILE', async (event) => {
+  const userData = getUserData();
+  const { muFolder } = userData;
+
+  const urls = [
+    `http://mu.yoursoups.com/client-updates/Item.bmd`,
+    `http://mu.yoursoups.com/client-updates/itemsetoption.bmd`,
+    `http://mu.yoursoups.com/client-updates/itemsettype.bmd`,
+  ];
+  const localPath = `${muFolder}\\Data\\Local`;
+  let message = '更新成功';
+
+  try {
+    // eslint-disable-next-line no-restricted-syntax
+    for (const itemUrl of urls) {
+      // eslint-disable-next-line no-await-in-loop
+      await downloadByUrl(itemUrl, localPath);
+    }
+  } catch (error) {
+    message = '异常,请重试';
+  }
+
+  event.reply('DOWNLOAD_FILE', message);
 });
 
 if (process.env.NODE_ENV === 'production') {
