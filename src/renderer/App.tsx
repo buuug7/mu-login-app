@@ -133,157 +133,179 @@ function SettingPage() {
     <div className="setting-page container">
       <h4>设置</h4>
       <div className="">
-        <form>
-          <h5>分辨率</h5>
-          <div className="mb-3">
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="radio"
-                name="Resolution"
-                value={1}
-                checked={Resolution === 1}
-                onChange={onResolutionChange}
-              />
-              <label className="form-check-label">800x600</label>
-            </div>
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="radio"
-                name="Resolution"
-                value={2}
-                checked={Resolution === 2}
-                onChange={onResolutionChange}
-              />
-              <label className="form-check-label">1024x768</label>
-            </div>
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="radio"
-                name="Resolution"
-                value={3}
-                checked={Resolution === 3}
-                onChange={onResolutionChange}
-              />
-              <label className="form-check-label" htmlFor="Resolution3">
-                1280x1024
-              </label>
-            </div>
-          </div>
-
-          <h5>图像质量</h5>
-          <div className="mb-3">
-            <div className="form-check-inline">
-              <input
-                className="form-check-input"
-                type="radio"
-                name="ColorDepth"
-                value={0}
-                checked={ColorDepth === 0}
-                onChange={onColorDepthChange}
-              />
-              <label className="form-check-label">16bit</label>
-            </div>
-            <div className="form-check-inline">
-              <input
-                className="form-check-input"
-                type="radio"
-                name="ColorDepth"
-                value={1}
-                checked={ColorDepth === 1}
-                onChange={onColorDepthChange}
-              />
-              <label className="form-check-label">32bit</label>
-            </div>
-          </div>
-
-          <h5>其他</h5>
-          <div className="mb-3">
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                checked={WindowMode === 1}
-                onChange={(e) => {
-                  console.log(e.target.checked);
-                  setWindowMode(e.target.checked ? 1 : 0);
-                }}
-              />
-              <label className="form-check-label">窗口模式</label>
-            </div>
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                checked={MusicOnOff === 1}
-                onChange={(e) => {
-                  console.log(e.target.checked);
-                  setMusicOnOff(e.target.checked ? 1 : 0);
-                }}
-              />
-              <label className="form-check-label">音效</label>
-            </div>
-            <div className="form-check">
-              <input
-                className="form-check-input"
-                type="checkbox"
-                checked={SoundOnOff === 1}
-                onChange={(e) => {
-                  console.log(e.target.checked);
-                  setSoundOnOff(e.target.checked ? 1 : 0);
-                }}
-              />
-              <label className="form-check-label">声音</label>
-            </div>
-          </div>
-
-          <h5>选择MU客户端目录</h5>
-          <div className="mb-3">
-            <button
-              className="btn btn-light"
-              type="button"
-              onClick={() => {
-                electron.ipcRenderer.selectFolder();
-                electron.ipcRenderer.on('SELECT_FOLDER', (data: any) => {
-                  const folder = data.filePaths[0];
-                  setMuFolder(folder);
-                });
-              }}
-            >
-              选择目录
-            </button>
-            <span className="ps-2">{muFolder}</span>
-          </div>
-
-          <h5>IP和端口</h5>
-          <div className="mb-3">
-            <label className="form-label">格式 192.168.1.21:44405</label>
+        <h5>分辨率</h5>
+        <div className="mb-3">
+          <div className="form-check">
             <input
-              type="text"
-              className="form-control"
-              value={ipAndPort}
+              className="form-check-input"
+              type="radio"
+              name="Resolution"
+              value={1}
+              checked={Resolution === 1}
+              onChange={onResolutionChange}
+            />
+            <label className="form-check-label">800x600</label>
+          </div>
+          <div className="form-check">
+            <input
+              className="form-check-input"
+              type="radio"
+              name="Resolution"
+              value={2}
+              checked={Resolution === 2}
+              onChange={onResolutionChange}
+            />
+            <label className="form-check-label">1024x768</label>
+          </div>
+          <div className="form-check">
+            <input
+              className="form-check-input"
+              type="radio"
+              name="Resolution"
+              value={3}
+              checked={Resolution === 3}
+              onChange={onResolutionChange}
+            />
+            <label className="form-check-label" htmlFor="Resolution3">
+              1280x1024
+            </label>
+          </div>
+        </div>
+
+        <h5>图像质量</h5>
+        <div className="mb-3">
+          <div className="form-check-inline">
+            <input
+              className="form-check-input"
+              type="radio"
+              name="ColorDepth"
+              value={0}
+              checked={ColorDepth === 0}
+              onChange={onColorDepthChange}
+            />
+            <label className="form-check-label">16bit</label>
+          </div>
+          <div className="form-check-inline">
+            <input
+              className="form-check-input"
+              type="radio"
+              name="ColorDepth"
+              value={1}
+              checked={ColorDepth === 1}
+              onChange={onColorDepthChange}
+            />
+            <label className="form-check-label">32bit</label>
+          </div>
+        </div>
+
+        <h5>其他</h5>
+        <div className="mb-3">
+          <div className="form-check">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              checked={WindowMode === 1}
               onChange={(e) => {
-                setIpAndPort(e.target.value);
+                console.log(e.target.checked);
+                setWindowMode(e.target.checked ? 1 : 0);
               }}
             />
+            <label className="form-check-label">窗口模式</label>
           </div>
-
-          <div className="mb-3">
-            <label className="form-label">用户账号</label>
+          <div className="form-check">
             <input
-              type="text"
-              className="form-control"
-              value={ID}
+              className="form-check-input"
+              type="checkbox"
+              checked={MusicOnOff === 1}
               onChange={(e) => {
-                setID(e.target.value);
+                console.log(e.target.checked);
+                setMusicOnOff(e.target.checked ? 1 : 0);
               }}
             />
+            <label className="form-check-label">音效</label>
           </div>
+          <div className="form-check">
+            <input
+              className="form-check-input"
+              type="checkbox"
+              checked={SoundOnOff === 1}
+              onChange={(e) => {
+                console.log(e.target.checked);
+                setSoundOnOff(e.target.checked ? 1 : 0);
+              }}
+            />
+            <label className="form-check-label">声音</label>
+          </div>
+        </div>
 
-          {Message && <div className="alert alert-success">{Message}</div>}
+        <h5>选择MU客户端目录</h5>
+        <div className="mb-3">
+          <button
+            className="btn btn-light"
+            type="button"
+            onClick={() => {
+              electron.ipcRenderer.selectFolder();
+              electron.ipcRenderer.on('SELECT_FOLDER', (data: any) => {
+                const folder = data.filePaths[0];
+                setMuFolder(folder);
+              });
+            }}
+          >
+            选择目录
+          </button>
+          <div className="ps-2">{muFolder}</div>
+        </div>
 
+        <h5>IP和端口</h5>
+        <div className="mb-3">
+          <label className="form-label">格式 192.168.1.21:44405</label>
+          <input
+            type="text"
+            className="form-control"
+            value={ipAndPort}
+            onChange={(e) => {
+              setIpAndPort(e.target.value);
+            }}
+          />
+        </div>
+
+        <div className="mb-3">
+          <label className="form-label">用户账号</label>
+          <input
+            type="text"
+            className="form-control"
+            value={ID}
+            onChange={(e) => {
+              setID(e.target.value);
+            }}
+          />
+        </div>
+
+        {Message && <div className="alert alert-success">{Message}</div>}
+
+        <div className="mb-3">
+          <button
+            type="submit"
+            className="btn btn-outline-primary"
+            disabled={isDownloading}
+            onClick={(e) => {
+              e.preventDefault();
+              setIsDownloading(true);
+              setMessage('');
+              electron.ipcRenderer.once('DOWNLOAD_FILE', (data: any) => {
+                console.log(`data`, data);
+                setMessage(data);
+                setIsDownloading(false);
+              });
+
+              electron.ipcRenderer.downloadFile();
+            }}
+          >
+            {isDownloading ? '下载中...' : '更新客户端'}
+          </button>
+        </div>
+
+        <div>
           <button
             type="submit"
             className="btn btn-primary me-2"
@@ -317,27 +339,7 @@ function SettingPage() {
           >
             返回
           </button>
-
-          <button
-            type="submit"
-            className="btn btn-outline-primary"
-            disabled={isDownloading}
-            onClick={(e) => {
-              e.preventDefault();
-              setIsDownloading(true);
-              setMessage('');
-              electron.ipcRenderer.once('DOWNLOAD_FILE', (data: any) => {
-                console.log(`data`, data);
-                setMessage(data);
-                setIsDownloading(false);
-              });
-
-              electron.ipcRenderer.downloadFile();
-            }}
-          >
-            {isDownloading ? '下载中...' : '更新客户端'}
-          </button>
-        </form>
+        </div>
       </div>
     </div>
   );
