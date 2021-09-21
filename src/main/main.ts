@@ -74,21 +74,42 @@ ipcMain.on('DOWNLOAD_FILE', async (event) => {
   const userData = getUserData();
   const { muFolder } = userData;
 
-  const urls = [
-    `http://mu.yoursoups.com/client-updates/Item.bmd`,
-    `http://mu.yoursoups.com/client-updates/itemsetoption.bmd`,
-    `http://mu.yoursoups.com/client-updates/itemsettype.bmd`,
+  const updateItems = [
+    {
+      link: `http://mu.yoursoups.com/client-updates/item.bmd`,
+      folder: `${muFolder}\\Data\\Local`,
+    },
+    {
+      link: `http://mu.yoursoups.com/client-updates/itemsetoption.bmd`,
+      folder: `${muFolder}\\Data\\Local`,
+    },
+    {
+      link: `http://mu.yoursoups.com/client-updates/itemsettype.bmd`,
+      folder: `${muFolder}\\Data\\Local`,
+    },
+    {
+      link: `http://mu.yoursoups.com/client-updates/GameEX.ini`,
+      folder: `${muFolder}`,
+    },
+    {
+      link: `http://mu.yoursoups.com/client-updates/CustomTitleSystem.ini`,
+      folder: `${muFolder}`,
+    },
   ];
-  const localPath = `${muFolder}\\Data\\Local`;
+
   let message = '更新成功';
 
   try {
     // eslint-disable-next-line no-restricted-syntax
-    for (const itemUrl of urls) {
+    for (const item of updateItems) {
       // eslint-disable-next-line no-await-in-loop
-      await downloadByUrl(itemUrl, localPath);
+      console.log(item);
+      console.log(item.link);
+      await downloadByUrl(item.link, item.folder);
     }
   } catch (error) {
+    console.log(error);
+
     message = '异常,请重试';
   }
 

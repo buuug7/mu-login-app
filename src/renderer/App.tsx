@@ -77,7 +77,7 @@ const Index = () => {
         <a href="http://mu.yoursoups.com/" target="_blank" rel="noreferrer">
           土鳖奇迹网站
         </a>
-        <div>一个有脾气的登录器 v1.1.0</div>
+        <div>一个有脾气的登录器 v1.2.0</div>
       </div>
     </div>
   );
