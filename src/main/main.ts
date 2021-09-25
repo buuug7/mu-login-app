@@ -21,9 +21,10 @@ import {
 } from 'electron';
 import fs from 'fs';
 import robot from 'robotjs';
-
+import axios from 'axios';
 import MenuBuilder from './menu';
 import { resolveHtmlPath, downloadByUrl } from './util';
+import { clientUpdateUrl } from '../config';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -45,12 +46,11 @@ ipcMain.on('SELECT_FOLDER', async (event) => {
   event.reply('SELECT_FOLDER', folders);
 });
 
-ipcMain.on('SAVE_USER_DATA', async (event, data) => {
+function saveUserData(data: any) {
   const userDataPath = app.getPath('userData');
   const dataPath = path.join(userDataPath, 'mu-login-app.json');
   fs.writeFileSync(dataPath, JSON.stringify(data));
-  event.reply('SAVE_USER_DATA', 'save data');
-});
+}
 
 function getUserData() {
   const userDataPath = app.getPath('userData');
@@ -65,55 +65,66 @@ function getUserData() {
   return data;
 }
 
-ipcMain.on('GET_USER_DATA', async (event) => {
-  const data = getUserData();
-  event.reply('GET_USER_DATA', data);
-});
-
-ipcMain.on('DOWNLOAD_FILE', async (event) => {
+async function downloadClientFiles() {
   const userData = getUserData();
   const { muFolder } = userData;
 
-  const updateItems = [
-    {
-      link: `http://mu.yoursoups.com/client-updates/item.bmd`,
-      folder: `${muFolder}\\Data\\Local`,
-    },
-    {
-      link: `http://mu.yoursoups.com/client-updates/itemsetoption.bmd`,
-      folder: `${muFolder}\\Data\\Local`,
-    },
-    {
-      link: `http://mu.yoursoups.com/client-updates/itemsettype.bmd`,
-      folder: `${muFolder}\\Data\\Local`,
-    },
-    {
-      link: `http://mu.yoursoups.com/client-updates/GameEX.ini`,
-      folder: `${muFolder}`,
-    },
-    {
-      link: `http://mu.yoursoups.com/client-updates/CustomTitleSystem.ini`,
-      folder: `${muFolder}`,
-    },
-  ];
+  // get updated items from server
+  const { data } = await axios.get(clientUpdateUrl);
 
-  let message = '更新成功';
+  const updateItems = data.items.map((item: any) => {
+    return {
+      ...item,
+      folder: path.join(muFolder, item.folder),
+    };
+  });
+
+  let message = '';
 
   try {
     // eslint-disable-next-line no-restricted-syntax
     for (const item of updateItems) {
-      // eslint-disable-next-line no-await-in-loop
-      console.log(item);
       console.log(item.link);
+      // eslint-disable-next-line no-await-in-loop
       await downloadByUrl(item.link, item.folder);
     }
+    saveUserData({ ...userData, version: data.version });
   } catch (error) {
     console.log(error);
-
     message = '异常,请重试';
   }
 
-  event.reply('DOWNLOAD_FILE', message);
+  return message;
+}
+
+ipcMain.on('SAVE_USER_DATA', async (event, data) => {
+  saveUserData(data);
+  event.reply('SAVE_USER_DATA', 'save data');
+});
+
+ipcMain.on('GET_USER_DATA', async (event) => {
+  const userData = getUserData();
+  event.reply('GET_USER_DATA', userData);
+});
+
+ipcMain.on('CHECK_CLIENT_UPDATE', async (event) => {
+  const userData = getUserData();
+  const { muFolder } = userData;
+
+  if (!muFolder) {
+    event.reply('CHECK_CLIENT_UPDATE', '请在设置中选择Mu客户端目录');
+    return;
+  }
+
+  // const { data } = await axios.get(clientUpdateUrl);
+  // const needUpdate = data.version > version.version;
+  // if (!needUpdate) {
+  //   event.reply('CHECK_CLIENT_UPDATE', '不需要更新');
+  //   return;
+  // }
+
+  const msg = await downloadClientFiles();
+  event.reply('CHECK_CLIENT_UPDATE', msg);
 });
 
 if (process.env.NODE_ENV === 'production') {
@@ -213,9 +224,6 @@ const createWindow = async () => {
 
   let timerF7: any = null;
   globalShortcut.register('F7', () => {
-    console.log(`timerF7`, timerF7);
-    // robot.setKeyboardDelay(50);
-
     if (timerF7) {
       clearInterval(timerF7);
       timerF7 = null;

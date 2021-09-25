@@ -116,8 +116,8 @@ contextBridge.exposeInMainWorld('electron', {
       ipcRenderer.send('GET_USER_DATA');
     },
 
-    downloadFile() {
-      ipcRenderer.send('DOWNLOAD_FILE');
+    checkClientUpdate() {
+      ipcRenderer.send('CHECK_CLIENT_UPDATE');
     },
   },
 });

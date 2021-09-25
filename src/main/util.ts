@@ -26,11 +26,7 @@ export async function downloadByUrl(url: string, localPath: string) {
       method: 'get',
       responseType: 'stream',
     });
-    const ext = path.extname(url);
     const bsName = path.basename(url);
-
-    console.log('ext', ext);
-    console.log('bsName', bsName);
 
     const chunks: any[] = [];
     console.log(`Status: ${response.status}`);

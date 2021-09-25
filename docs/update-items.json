@@ -1,0 +1,25 @@
+{
+  "version": 1,
+  "items": [
+    {
+      "link": "http://mu.yoursoups.com/client-updates/item.bmd",
+      "folder": "Data/Local"
+    },
+    {
+      "link": "http://mu.yoursoups.com/client-updates/itemsetoption.bmd",
+      "folder": "Data/Local"
+    },
+    {
+      "link": "http://mu.yoursoups.com/client-updates/itemsettype.bmd",
+      "folder": "Data/Local"
+    },
+    {
+      "link": "http://mu.yoursoups.com/client-updates/GameEX.ini",
+      "folder": ""
+    },
+    {
+      "link": "http://mu.yoursoups.com/client-updates/CustomTitleSystem.ini",
+      "folder": ""
+    }
+  ]
+}

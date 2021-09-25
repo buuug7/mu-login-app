@@ -1,4 +1,5 @@
 /* eslint-disable jsx-a11y/label-has-associated-control */
+/* eslint-disable no-alert */
 import React, { useEffect, useState } from 'react';
 import {
   MemoryRouter as Router,
@@ -9,6 +10,7 @@ import {
 } from 'react-router-dom';
 
 import './App.global.css';
+import { showIpAndPortOption, updateEveryLaunch } from '../config';
 
 declare global {
   interface Window {
@@ -21,6 +23,7 @@ const { electron } = window;
 const Index = () => {
   const [muFolder, setMuFolder] = useState('');
   const [ipAndPort, setIpAndPort] = useState('');
+  const [isSync, setIsSync] = useState(true);
 
   useEffect(() => {
     electron.ipcRenderer.once('GET_USER_DATA', (data: any) => {
@@ -34,6 +37,20 @@ const Index = () => {
     });
 
     electron.ipcRenderer.getUserData();
+
+    if (updateEveryLaunch) {
+      electron.ipcRenderer.once('CHECK_CLIENT_UPDATE', (data: any) => {
+        console.log(data);
+        if (data) {
+          alert(data);
+        }
+        setIsSync(false);
+      });
+
+      electron.ipcRenderer.checkClientUpdate();
+    } else {
+      setIsSync(false);
+    }
   }, []);
 
   return (
@@ -42,7 +59,7 @@ const Index = () => {
         <h2 className="text-center">土鳖奇迹登录器</h2>
       </div>
 
-      <div className="text-center text-muted mt-3 mb-3">
+      <div className="text-center text-muted my-2">
         <div>F8右键挂机, F7一键连击</div>
         <div>取消请再次按相同快捷键</div>
       </div>
@@ -56,6 +73,7 @@ const Index = () => {
 
       <div className="flex-center actions">
         <button
+          disabled={isSync}
           type="button"
           className="btn btn-primary me-1"
           onClick={() => {
@@ -66,7 +84,7 @@ const Index = () => {
             electron.ipcRenderer.runMu(muFolder, ipAndPort);
           }}
         >
-          启动游戏
+          {isSync ? '同步中...' : '启动游戏'}
         </button>
         <Link to="/setting" className="btn btn-outline-primary">
           参数设置
@@ -77,7 +95,7 @@ const Index = () => {
         <a href="http://mu.yoursoups.com/" target="_blank" rel="noreferrer">
           土鳖奇迹网站
         </a>
-        <div>一个有脾气的登录器 v1.2.0</div>
+        <div>一个有脾气的登录器 v1.3.0</div>
       </div>
     </div>
   );
@@ -94,7 +112,6 @@ function SettingPage() {
   const [muFolder, setMuFolder] = useState('');
   const [ipAndPort, setIpAndPort] = useState('');
   const [Message, setMessage] = useState('');
-  const [isDownloading, setIsDownloading] = useState(false);
 
   const onResolutionChange = (e: any) => {
     setResolution(Number(e.target.value));
@@ -256,18 +273,22 @@ function SettingPage() {
           <div className="ps-2">{muFolder}</div>
         </div>
 
-        <h5>IP和端口</h5>
-        <div className="mb-3">
-          <label className="form-label">格式 192.168.1.21:44405</label>
-          <input
-            type="text"
-            className="form-control"
-            value={ipAndPort}
-            onChange={(e) => {
-              setIpAndPort(e.target.value);
-            }}
-          />
-        </div>
+        {showIpAndPortOption && (
+          <div>
+            <h5>IP和端口</h5>
+            <div className="mb-3">
+              <label className="form-label">格式 192.168.1.21:44405</label>
+              <input
+                type="text"
+                className="form-control"
+                value={ipAndPort}
+                onChange={(e) => {
+                  setIpAndPort(e.target.value);
+                }}
+              />
+            </div>
+          </div>
+        )}
 
         <div className="mb-3">
           <label className="form-label">用户账号</label>
@@ -282,28 +303,6 @@ function SettingPage() {
         </div>
 
         {Message && <div className="alert alert-success">{Message}</div>}
-
-        <div className="mb-3">
-          <button
-            type="submit"
-            className="btn btn-outline-primary"
-            disabled={isDownloading}
-            onClick={(e) => {
-              e.preventDefault();
-              setIsDownloading(true);
-              setMessage('');
-              electron.ipcRenderer.once('DOWNLOAD_FILE', (data: any) => {
-                console.log(`data`, data);
-                setMessage(data);
-                setIsDownloading(false);
-              });
-
-              electron.ipcRenderer.downloadFile();
-            }}
-          >
-            {isDownloading ? '下载中...' : '更新客户端'}
-          </button>
-        </div>
 
         <div>
           <button
