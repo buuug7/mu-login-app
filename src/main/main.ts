@@ -21,30 +21,13 @@ import {
 } from 'electron';
 import fs from 'fs';
 import robot from 'robotjs';
+import child from 'child_process';
 import axios from 'axios';
 import MenuBuilder from './menu';
 import { resolveHtmlPath, downloadByUrl } from './util';
 import { clientUpdateUrl } from '../config';
 
 let mainWindow: BrowserWindow | null = null;
-
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
-});
-
-ipcMain.on('GET_USER_REGEDIT_CONFIG', async (event, data) => {
-  event.reply('GET_USER_REGEDIT_CONFIG', data);
-});
-
-ipcMain.on('SELECT_FOLDER', async (event) => {
-  const folders = await dialog.showOpenDialog({
-    properties: ['openDirectory'],
-  });
-
-  event.reply('SELECT_FOLDER', folders);
-});
 
 function saveUserData(data: any) {
   const userDataPath = app.getPath('userData');
@@ -97,6 +80,51 @@ async function downloadClientFiles() {
   return message;
 }
 
+ipcMain.on('GET_USER_REGEDIT_CONFIG', async (event, data) => {
+  event.reply('GET_USER_REGEDIT_CONFIG', data);
+});
+
+ipcMain.on('SELECT_FOLDER', async (event) => {
+  const folders = await dialog.showOpenDialog({
+    properties: ['openDirectory'],
+  });
+
+  event.reply('SELECT_FOLDER', folders);
+});
+
+ipcMain.on('RUN_MU', async (event) => {
+  const userData = getUserData();
+  const { muFolder, ipAndPort } = userData;
+  let ipAndPortArr = ['120.26.54.40', '44405'];
+  if (ipAndPort) {
+    ipAndPortArr = ipAndPort.split(':');
+  }
+
+  if (!muFolder) {
+    await dialog.showMessageBox({
+      message: '请在设置中选择Mu客户端目录',
+    });
+    return;
+  }
+
+  const executablePath = `${muFolder}\\main.exe`;
+  const param = ['connect', `/u${ipAndPortArr[0]}`, `/p${ipAndPortArr[1]}`];
+
+  child.execFile(
+    executablePath,
+    param,
+    {
+      cwd: muFolder,
+    },
+    (err, stdout, stderr) => {
+      if (err) {
+        console.error(err);
+      }
+      robot.mouseToggle('up', 'right');
+    }
+  );
+});
+
 ipcMain.on('SAVE_USER_DATA', async (event, data) => {
   saveUserData(data);
   event.reply('SAVE_USER_DATA', 'save data');
@@ -115,13 +143,6 @@ ipcMain.on('CHECK_CLIENT_UPDATE', async (event) => {
     event.reply('CHECK_CLIENT_UPDATE', '请在设置中选择Mu客户端目录');
     return;
   }
-
-  // const { data } = await axios.get(clientUpdateUrl);
-  // const needUpdate = data.version > version.version;
-  // if (!needUpdate) {
-  //   event.reply('CHECK_CLIENT_UPDATE', '不需要更新');
-  //   return;
-  // }
 
   const msg = await downloadClientFiles();
   event.reply('CHECK_CLIENT_UPDATE', msg);

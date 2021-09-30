@@ -21,32 +21,13 @@ declare global {
 const { electron } = window;
 
 const Index = () => {
-  const [muFolder, setMuFolder] = useState('');
-  const [ipAndPort, setIpAndPort] = useState('');
   const [isSync, setIsSync] = useState(true);
 
   useEffect(() => {
-    electron.ipcRenderer.once('GET_USER_DATA', (data: any) => {
-      console.log(data);
-      if (data.muFolder) {
-        setMuFolder(data.muFolder);
-      }
-      if (data.ipAndPort) {
-        setIpAndPort(data.ipAndPort);
-      }
-    });
-
-    electron.ipcRenderer.getUserData();
-
     if (updateEveryLaunch) {
       electron.ipcRenderer.once('CHECK_CLIENT_UPDATE', (data: any) => {
-        console.log(data);
-        if (data) {
-          alert(data);
-        }
         setIsSync(false);
       });
-
       electron.ipcRenderer.checkClientUpdate();
     } else {
       setIsSync(false);
@@ -77,11 +58,7 @@ const Index = () => {
           type="button"
           className="btn btn-primary me-1"
           onClick={() => {
-            if (!muFolder) {
-              window.alert('请在设置中选择Mu客户端目录');
-              return;
-            }
-            electron.ipcRenderer.runMu(muFolder, ipAndPort);
+            electron.ipcRenderer.runMu();
           }}
         >
           {isSync ? '同步中...' : '启动游戏'}
