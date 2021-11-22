@@ -95,7 +95,7 @@ ipcMain.on('SELECT_FOLDER', async (event) => {
 ipcMain.on('RUN_MU', async (event) => {
   const userData = getUserData();
   const { muFolder, ipAndPort } = userData;
-  let ipAndPortArr = ['120.26.54.40', '44405'];
+  let ipAndPortArr = ['120.55.52.223', '44405'];
   if (ipAndPort) {
     ipAndPortArr = ipAndPort.split(':');
   }
