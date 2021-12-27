@@ -25,7 +25,7 @@ import child from 'child_process';
 import axios from 'axios';
 import MenuBuilder from './menu';
 import { resolveHtmlPath, downloadByUrl } from './util';
-import { clientUpdateUrl } from '../config';
+import { clientUpdateUrl, defaultIp, defaultPort } from '../config';
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -95,7 +95,7 @@ ipcMain.on('SELECT_FOLDER', async (event) => {
 ipcMain.on('RUN_MU', async (event) => {
   const userData = getUserData();
   const { muFolder, ipAndPort } = userData;
-  let ipAndPortArr = ['120.55.52.223', '44405'];
+  let ipAndPortArr = [defaultIp, defaultPort];
   if (ipAndPort) {
     ipAndPortArr = ipAndPort.split(':');
   }
