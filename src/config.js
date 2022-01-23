@@ -1,5 +1,5 @@
 // default IP
-export const defaultIp = '120.55.52.223';
+export const defaultIp = '101.132.124.204';
 
 // default port
 export const defaultPort = '44405';

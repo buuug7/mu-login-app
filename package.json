@@ -1,7 +1,7 @@
 {
   "name": "mu-login-app",
-  "productName": "土鳖奇迹登录器",
-  "description": "土鳖奇迹登录器",
+  "productName": "土鳖助手",
+  "description": "土鳖助手",
   "scripts": {
     "build": "concurrently \"yarn build:main\" \"yarn build:renderer\"",
     "build:main": "cross-env NODE_ENV=production webpack --config ./.erb/configs/webpack.config.main.prod.babel.js",
@@ -30,7 +30,7 @@
     ]
   },
   "build": {
-    "productName": "土鳖奇迹登录器",
+    "productName": "土鳖助手",
     "appId": "com.buuug7.tubieqijidengluqi",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",

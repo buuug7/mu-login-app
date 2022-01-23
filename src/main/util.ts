@@ -49,7 +49,11 @@ export async function downloadByUrl(url: string, localPath: string) {
         resolve('下载成功');
       });
     });
-  } catch (err) {
-    return Promise.reject(err);
+  } catch (err: any) {
+    console.log(err.response.status);
+    const message = err.response
+      ? `status: ${err.response.status},statusText: ${err.response.statusText}`
+      : 'Unknown Error';
+    return Promise.reject(new Error(message));
   }
 }

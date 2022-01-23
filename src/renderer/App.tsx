@@ -10,7 +10,7 @@ import {
 } from 'react-router-dom';
 
 import './App.global.css';
-import { showIpAndPortOption, updateEveryLaunch } from '../config';
+import { showIpAndPortOption } from '../config';
 
 declare global {
   interface Window {
@@ -21,23 +21,20 @@ declare global {
 const { electron } = window;
 
 const Index = () => {
-  const [isSync, setIsSync] = useState(true);
+  const [isSync, setIsSync] = useState(false);
 
-  useEffect(() => {
-    if (updateEveryLaunch) {
-      electron.ipcRenderer.once('CHECK_CLIENT_UPDATE', (data: any) => {
-        setIsSync(false);
-      });
-      electron.ipcRenderer.checkClientUpdate();
-    } else {
+  const updateClient = () => {
+    setIsSync(true);
+    electron.ipcRenderer.once('CHECK_CLIENT_UPDATE', () => {
       setIsSync(false);
-    }
-  }, []);
+    });
+    electron.ipcRenderer.checkClientUpdate();
+  };
 
   return (
     <div className="index-page">
       <div className="header">
-        <h2 className="text-center">土鳖奇迹登录器</h2>
+        <h2 className="text-center">土鳖助手</h2>
       </div>
 
       <div className="text-center text-muted my-2">
@@ -58,12 +55,22 @@ const Index = () => {
           type="button"
           className="btn btn-primary me-1"
           onClick={() => {
+            updateClient();
+          }}
+        >
+          {isSync ? '更新中...' : '更新游戏'}
+        </button>
+        {/* <button
+          disabled={isSync}
+          type="button"
+          className="btn btn-primary me-1"
+          onClick={() => {
             electron.ipcRenderer.runMu();
           }}
         >
           {isSync ? '同步中...' : '启动游戏'}
-        </button>
-        <Link to="/setting" className="btn btn-outline-primary">
+        </button> */}
+        <Link to="/setting" className="btn btn-outline-primary disabled">
           参数设置
         </Link>
       </div>
@@ -72,7 +79,7 @@ const Index = () => {
         <a href="http://mu.yoursoups.com/" target="_blank" rel="noreferrer">
           土鳖奇迹网站
         </a>
-        <div>一个有脾气的登录器 v1.3.1</div>
+        <div>v1.3.1</div>
       </div>
     </div>
   );

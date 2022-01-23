@@ -1,4 +1,4 @@
-## 土鳖奇迹私服登录器
+## 土鳖助手
 
 一款简单易用的奇迹私服登录器，该项目基于[electron](https://github.com/electron/electron)
 

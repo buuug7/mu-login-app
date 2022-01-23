@@ -29,6 +29,8 @@ import { clientUpdateUrl, defaultIp, defaultPort } from '../config';
 
 let mainWindow: BrowserWindow | null = null;
 
+const muFolder = path.resolve(process.execPath, '..', '..');
+
 function saveUserData(data: any) {
   const userDataPath = app.getPath('userData');
   const dataPath = path.join(userDataPath, 'mu-login-app.json');
@@ -50,7 +52,6 @@ function getUserData() {
 
 async function downloadClientFiles() {
   const userData = getUserData();
-  const { muFolder } = userData;
 
   // get updated items from server
   const { data } = await axios.get(clientUpdateUrl);
@@ -62,22 +63,20 @@ async function downloadClientFiles() {
     };
   });
 
-  let message = '';
-
-  try {
-    // eslint-disable-next-line no-restricted-syntax
-    for (const item of updateItems) {
-      console.log(item.link);
+  // eslint-disable-next-line no-restricted-syntax
+  for (const item of updateItems) {
+    console.log(item.link);
+    try {
       // eslint-disable-next-line no-await-in-loop
       await downloadByUrl(item.link, item.folder);
+    } catch (err: any) {
+      console.log(err.message);
     }
-    saveUserData({ ...userData, version: data.version });
-  } catch (error) {
-    console.log(error);
-    message = '异常,请重试';
   }
 
-  return message;
+  saveUserData({ ...userData, version: data.version });
+
+  return 'message';
 }
 
 ipcMain.on('GET_USER_REGEDIT_CONFIG', async (event, data) => {
@@ -94,7 +93,7 @@ ipcMain.on('SELECT_FOLDER', async (event) => {
 
 ipcMain.on('RUN_MU', async (event) => {
   const userData = getUserData();
-  const { muFolder, ipAndPort } = userData;
+  const { ipAndPort } = userData;
   let ipAndPortArr = [defaultIp, defaultPort];
   if (ipAndPort) {
     ipAndPortArr = ipAndPort.split(':');
@@ -136,11 +135,8 @@ ipcMain.on('GET_USER_DATA', async (event) => {
 });
 
 ipcMain.on('CHECK_CLIENT_UPDATE', async (event) => {
-  const userData = getUserData();
-  const { muFolder } = userData;
-
   if (!muFolder) {
-    event.reply('CHECK_CLIENT_UPDATE', '请在设置中选择Mu客户端目录');
+    event.reply('CHECK_CLIENT_UPDATE', '请将该程序放置在Mu客户端目录');
     return;
   }
 
