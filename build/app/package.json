@@ -1,7 +1,7 @@
 {
   "name": "TuBieQiJiDengLuQi",
-  "productName": "土鳖助手",
-  "version": "1.3.1",
+  "productName": "土鳖登录器",
+  "version": "1.4.0",
   "description": "Electron application boilerplate based on React, React Router, Webpack, React Hot Loader for rapid application development",
   "main": "./dist/main/main.js",
   "author": {
@@ -15,7 +15,5 @@
     "postinstall": "yarn electron-rebuild && yarn link-modules"
   },
   "license": "MIT",
-  "dependencies": {
-    "robotjs": "^0.6.0"
-  }
+  "dependencies": {}
 }

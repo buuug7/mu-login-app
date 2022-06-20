@@ -19,14 +19,13 @@ if (process.env.NODE_ENV === 'development') {
   };
 }
 
-export async function downloadByUrl(url: string, localPath: string) {
+export async function downloadByUrl(url: string, filename: string) {
   try {
     const response = await axios({
       url: encodeURI(url),
       method: 'get',
       responseType: 'stream',
     });
-    const bsName = path.basename(url);
 
     const chunks: any[] = [];
     console.log(`Status: ${response.status}`);
@@ -42,7 +41,6 @@ export async function downloadByUrl(url: string, localPath: string) {
 
       response.data.on('end', () => {
         const buf = Buffer.concat(chunks);
-        const filename = path.resolve(localPath, bsName);
         console.log(`filename`, filename);
 
         fs.writeFileSync(filename, buf);

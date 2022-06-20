@@ -25,8 +25,10 @@ const Index = () => {
 
   const updateClient = () => {
     setIsSync(true);
-    electron.ipcRenderer.once('CHECK_CLIENT_UPDATE', () => {
+    electron.ipcRenderer.once('CHECK_CLIENT_UPDATE', (msg) => {
       setIsSync(false);
+      console.log(`msg`, msg);
+      electron.ipcRenderer.runMu();
     });
     electron.ipcRenderer.checkClientUpdate();
   };
@@ -34,12 +36,7 @@ const Index = () => {
   return (
     <div className="index-page">
       <div className="header">
-        <h2 className="text-center">土鳖助手</h2>
-      </div>
-
-      <div className="text-center text-muted my-2">
-        <div>F8右键挂机, F7一键连击</div>
-        <div>取消请再次按相同快捷键</div>
+        <h2 className="text-center">土鳖登录器</h2>
       </div>
 
       <div className="body container">
@@ -58,19 +55,9 @@ const Index = () => {
             updateClient();
           }}
         >
-          {isSync ? '更新中...' : '更新游戏'}
+          {isSync ? '更新中' : '启动游戏'}
         </button>
-        {/* <button
-          disabled={isSync}
-          type="button"
-          className="btn btn-primary me-1"
-          onClick={() => {
-            electron.ipcRenderer.runMu();
-          }}
-        >
-          {isSync ? '同步中...' : '启动游戏'}
-        </button> */}
-        <Link to="/setting" className="btn btn-outline-primary disabled">
+        <Link to="/setting" className="btn btn-outline-primary">
           参数设置
         </Link>
       </div>
@@ -79,7 +66,7 @@ const Index = () => {
         <a href="http://mu.yoursoups.com/" target="_blank" rel="noreferrer">
           土鳖奇迹网站
         </a>
-        <div>v1.3.1</div>
+        <div>v1.4.0</div>
       </div>
     </div>
   );
@@ -248,6 +235,7 @@ function SettingPage() {
               electron.ipcRenderer.selectFolder();
               electron.ipcRenderer.on('SELECT_FOLDER', (data: any) => {
                 const folder = data.filePaths[0];
+                console.log(`floder`, folder);
                 setMuFolder(folder);
               });
             }}

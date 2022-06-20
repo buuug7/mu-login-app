@@ -11,16 +11,8 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import {
-  app,
-  BrowserWindow,
-  shell,
-  ipcMain,
-  dialog,
-  globalShortcut,
-} from 'electron';
+import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
 import fs from 'fs';
-import robot from 'robotjs';
 import child from 'child_process';
 import axios from 'axios';
 import MenuBuilder from './menu';
@@ -29,7 +21,7 @@ import { clientUpdateUrl, defaultIp, defaultPort } from '../config';
 
 let mainWindow: BrowserWindow | null = null;
 
-const muFolder = path.resolve(process.execPath, '..', '..');
+const muDefaultFolder = path.resolve(process.execPath, '..', '..');
 
 function saveUserData(data: any) {
   const userDataPath = app.getPath('userData');
@@ -52,31 +44,49 @@ function getUserData() {
 
 async function downloadClientFiles() {
   const userData = getUserData();
+  console.log(`userData`, userData);
+  const { muFolder = muDefaultFolder, version } = userData;
 
   // get updated items from server
-  const { data } = await axios.get(clientUpdateUrl);
+  try {
+    const { data } = await axios.get(clientUpdateUrl);
+    console.log(`data`, data);
 
-  const updateItems = data.items.map((item: any) => {
-    return {
-      ...item,
-      folder: path.join(muFolder, item.folder),
-    };
-  });
+    console.log(`local version: ${version}`);
+    console.log(`latest version: ${data.version}`);
 
-  // eslint-disable-next-line no-restricted-syntax
-  for (const item of updateItems) {
-    console.log(item.link);
-    try {
-      // eslint-disable-next-line no-await-in-loop
-      await downloadByUrl(item.link, item.folder);
-    } catch (err: any) {
-      console.log(err.message);
+    if (data.version <= version) {
+      console.log(`The current version is the latest, no need to update!`);
+      return 'The current version is the latest, no need to update';
     }
+
+    const updateItems = data.items.map((item: any) => {
+      const filename = item.link.split('/').pop().split('__').join('/');
+      return {
+        ...item,
+        filename: path.join(muFolder, filename),
+      };
+    });
+
+    console.log(`begin update client`);
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const item of updateItems) {
+      console.log(item.link);
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        await downloadByUrl(item.link, item.filename);
+      } catch (err: any) {
+        console.log(err.message);
+      }
+    }
+
+    saveUserData({ ...userData, version: data.version });
+    return 'ok';
+  } catch (error) {
+    console.log('error:', error.message);
+    return 'error';
   }
-
-  saveUserData({ ...userData, version: data.version });
-
-  return 'message';
 }
 
 ipcMain.on('GET_USER_REGEDIT_CONFIG', async (event, data) => {
@@ -93,7 +103,7 @@ ipcMain.on('SELECT_FOLDER', async (event) => {
 
 ipcMain.on('RUN_MU', async (event) => {
   const userData = getUserData();
-  const { ipAndPort } = userData;
+  const { ipAndPort, muFolder = muDefaultFolder } = userData;
   let ipAndPortArr = [defaultIp, defaultPort];
   if (ipAndPort) {
     ipAndPortArr = ipAndPort.split(':');
@@ -108,6 +118,7 @@ ipcMain.on('RUN_MU', async (event) => {
 
   const executablePath = `${muFolder}\\main.exe`;
   const param = ['connect', `/u${ipAndPortArr[0]}`, `/p${ipAndPortArr[1]}`];
+  // const param: any = [];
 
   child.execFile(
     executablePath,
@@ -119,7 +130,6 @@ ipcMain.on('RUN_MU', async (event) => {
       if (err) {
         console.error(err);
       }
-      robot.mouseToggle('up', 'right');
     }
   );
 });
@@ -135,6 +145,10 @@ ipcMain.on('GET_USER_DATA', async (event) => {
 });
 
 ipcMain.on('CHECK_CLIENT_UPDATE', async (event) => {
+  const userData = getUserData();
+  console.log(`userData1`, userData);
+  const { muFolder = muDefaultFolder } = userData;
+
   if (!muFolder) {
     event.reply('CHECK_CLIENT_UPDATE', '请将该程序放置在Mu客户端目录');
     return;
@@ -224,34 +238,6 @@ const createWindow = async () => {
   mainWindow.webContents.on('new-window', (event, url) => {
     event.preventDefault();
     shell.openExternal(url);
-  });
-
-  let isF8Down = false;
-  globalShortcut.register('F8', () => {
-    console.log(`isF8Down`, isF8Down);
-
-    if (!isF8Down) {
-      robot.mouseToggle('down', 'right');
-      isF8Down = true;
-    } else {
-      robot.mouseToggle('up', 'right');
-      isF8Down = false;
-    }
-  });
-
-  let timerF7: any = null;
-  globalShortcut.register('F7', () => {
-    if (timerF7) {
-      clearInterval(timerF7);
-      timerF7 = null;
-      robot.mouseToggle('up', 'right');
-    } else {
-      robot.mouseToggle('down', 'right');
-      timerF7 = setInterval(() => {
-        robot.keyTap('1');
-        robot.keyTap('2');
-      }, 30);
-    }
   });
 };
 

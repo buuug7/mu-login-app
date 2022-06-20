@@ -12,4 +12,4 @@ export const showIpAndPortOption = false;
 
 // 更新客户端 URL
 export const clientUpdateUrl =
-  'http://mu.yoursoups.com/client-updates/update-items.json';
+  'http://mu.yoursoups.com/client-updates/v1/update.json';
