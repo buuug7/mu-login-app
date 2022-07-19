@@ -1,5 +1,5 @@
 # document
 
-## 服务器更新文件清单
+## 客户端更新文件样例
 
-请参考 `update-items.json`
+请参考 `update.json`

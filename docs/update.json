@@ -1,0 +1,40 @@
+{
+  "version": 82,
+  "apiVersion": 2,
+  "forceUpdate": false,
+  "baseUrl": "http://mu.yoursoups.com/client-updates/v1/",
+  "items": [
+    {
+      "link": "Main.dll",
+      "needUpdate": false
+    },
+    {
+      "link": "main.premium",
+      "needUpdate": false
+    },
+    {
+      "link": "Settings.ini",
+      "needUpdate": false
+    },
+    {
+      "link": "Data__Local__Mix.bmd",
+      "needUpdate": false
+    },
+    {
+      "link": "Data__Local__Eng__Item_Eng.bmd",
+      "needUpdate": false
+    },
+    {
+      "link": "Data__Local__Eng__ItemTooltip_Eng.bmd",
+      "needUpdate": false
+    },
+    {
+      "link": "Data__Local__Eng__ItemSetOption_eng.bmd",
+      "needUpdate": false
+    },
+    {
+      "link": "Data__Local__ItemSetType.bmd",
+      "needUpdate": false
+    }
+  ]
+}

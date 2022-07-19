@@ -12,82 +12,13 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
 import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
-import fs from 'fs';
-import child from 'child_process';
-import axios from 'axios';
 import MenuBuilder from './menu';
-import { resolveHtmlPath, downloadByUrl } from './util';
-import { clientUpdateUrl, defaultIp, defaultPort } from '../config';
+import { resolveHtmlPath } from './util';
+import { getUserData, saveUserData } from './user-data';
+import { run as runClientCheck } from './check-client-update';
+import runMu from './run-mu';
 
 let mainWindow: BrowserWindow | null = null;
-
-const muDefaultFolder = path.resolve(process.execPath, '..', '..');
-
-function saveUserData(data: any) {
-  const userDataPath = app.getPath('userData');
-  const dataPath = path.join(userDataPath, 'mu-login-app.json');
-  fs.writeFileSync(dataPath, JSON.stringify(data));
-}
-
-function getUserData() {
-  const userDataPath = app.getPath('userData');
-  const dataPath = path.join(userDataPath, 'mu-login-app.json');
-  let data;
-  try {
-    data = JSON.parse(fs.readFileSync(dataPath).toString());
-  } catch (error) {
-    console.log(error);
-    data = {};
-  }
-  return data;
-}
-
-async function downloadClientFiles() {
-  const userData = getUserData();
-  console.log(`userData`, userData);
-  const { muFolder = muDefaultFolder, version } = userData;
-
-  // get updated items from server
-  try {
-    const { data } = await axios.get(clientUpdateUrl);
-    console.log(`data`, data);
-
-    console.log(`local version: ${version}`);
-    console.log(`latest version: ${data.version}`);
-
-    if (data.version <= version) {
-      console.log(`The current version is the latest, no need to update!`);
-      return 'The current version is the latest, no need to update';
-    }
-
-    const updateItems = data.items.map((item: any) => {
-      const filename = item.link.split('/').pop().split('__').join('/');
-      return {
-        ...item,
-        filename: path.join(muFolder, filename),
-      };
-    });
-
-    console.log(`begin update client`);
-
-    // eslint-disable-next-line no-restricted-syntax
-    for (const item of updateItems) {
-      console.log(item.link);
-      try {
-        // eslint-disable-next-line no-await-in-loop
-        await downloadByUrl(item.link, item.filename);
-      } catch (err: any) {
-        console.log(err.message);
-      }
-    }
-
-    saveUserData({ ...userData, version: data.version });
-    return 'ok';
-  } catch (error) {
-    console.log('error:', error.message);
-    return 'error';
-  }
-}
 
 ipcMain.on('GET_USER_REGEDIT_CONFIG', async (event, data) => {
   event.reply('GET_USER_REGEDIT_CONFIG', data);
@@ -101,37 +32,8 @@ ipcMain.on('SELECT_FOLDER', async (event) => {
   event.reply('SELECT_FOLDER', folders);
 });
 
-ipcMain.on('RUN_MU', async (event) => {
-  const userData = getUserData();
-  const { ipAndPort, muFolder = muDefaultFolder } = userData;
-  let ipAndPortArr = [defaultIp, defaultPort];
-  if (ipAndPort) {
-    ipAndPortArr = ipAndPort.split(':');
-  }
-
-  if (!muFolder) {
-    await dialog.showMessageBox({
-      message: '请在设置中选择Mu客户端目录',
-    });
-    return;
-  }
-
-  const executablePath = `${muFolder}\\main.exe`;
-  const param = ['connect', `/u${ipAndPortArr[0]}`, `/p${ipAndPortArr[1]}`];
-  // const param: any = [];
-
-  child.execFile(
-    executablePath,
-    param,
-    {
-      cwd: muFolder,
-    },
-    (err, stdout, stderr) => {
-      if (err) {
-        console.error(err);
-      }
-    }
-  );
+ipcMain.on('RUN_MU', async () => {
+  runMu();
 });
 
 ipcMain.on('SAVE_USER_DATA', async (event, data) => {
@@ -145,17 +47,7 @@ ipcMain.on('GET_USER_DATA', async (event) => {
 });
 
 ipcMain.on('CHECK_CLIENT_UPDATE', async (event) => {
-  const userData = getUserData();
-  console.log(`userData1`, userData);
-  const { muFolder = muDefaultFolder } = userData;
-
-  if (!muFolder) {
-    event.reply('CHECK_CLIENT_UPDATE', '请将该程序放置在Mu客户端目录');
-    return;
-  }
-
-  const msg = await downloadClientFiles();
-  event.reply('CHECK_CLIENT_UPDATE', msg);
+  runClientCheck(event);
 });
 
 if (process.env.NODE_ENV === 'production') {
